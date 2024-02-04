@@ -1,21 +1,23 @@
 import cors from "cors";
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 import express from "express";
-import logger from "./middlewares/logger.js";
+import logger from "./middlewares/logger";
+import router from "./routes";
 
 dotenv.config();
 
 const app = express();
 
-app.use(
-  cors({
-    origins: ["http://localhost:5173"],
-    methods: "*",
-    withCredentials: true,
-  })
-);
+const options = {
+  origin: ["http://localhost:5173"],
+  methods: "*",
+  credentials: true,
+};
+
+app.use(cors(options));
 
 app.use(logger);
+app.use(router);
 
 const StartServer = async () => {
   app.listen(process.env.PORT, () => {

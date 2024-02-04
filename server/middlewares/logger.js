@@ -1,6 +1,0 @@
-const logger = async (req, res, next) => {
-  console.log(new Date().toLocaleString(), "\t", req.method, "\t", req.url);
-  next();
-};
-
-export default logger;
