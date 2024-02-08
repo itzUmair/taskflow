@@ -1,27 +1,32 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { FormVerifier, LoginUser } from "./auth-logic";
+import { FormVerifier, SignupUser } from "./auth-logic";
 import Logo from "/logo-light.svg";
 
 type FormErrors = {
   EmailError: string | null;
   PasswordError: string | null;
+  ConfirmPasswordError: string | null;
 };
 
 type FormData = {
   email: string;
   password: string;
+  confirmPassword: string;
 };
 
-const Login = () => {
+const Signup = () => {
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
+    confirmPassword: "",
   });
 
   const [formError, setFormError] = useState<FormErrors>({
     EmailError: null,
     PasswordError: null,
+    ConfirmPasswordError: null,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -37,12 +42,20 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const validity = FormVerifier(formData.email, formData.password);
+    const validity = FormVerifier(
+      formData.email,
+      formData.password,
+      formData.confirmPassword
+    );
 
     if (validity.type !== "valid") {
       if (validity.type === "EmailError") {
         setFormError((prevState) => {
           return { ...prevState, EmailError: validity.error };
+        });
+      } else if (validity.type === "ConfirmPasswordError") {
+        setFormError((prevState) => {
+          return { ...prevState, ConfirmPasswordError: validity.error };
         });
       } else {
         setFormError((prevState) => {
@@ -52,20 +65,24 @@ const Login = () => {
       return;
     }
 
-    const response = await LoginUser(formData.email, formData.password);
+    const response = await SignupUser(formData.email, formData.password);
 
-    if (response?.status !== 200) {
-      if (response?.status === 404) {
+    if (response?.status !== 201) {
+      if (response?.status === 400) {
         setFormError((prevState) => {
           return { ...prevState, EmailError: response.message };
         });
-      } else if (response?.status === 401) {
-        setFormError((prevState) => {
-          return { ...prevState, PasswordError: response.message };
-        });
       }
     } else {
-      navigate("/dashboard");
+      toast.success(
+        `Account created successfully!
+        Try logging in...`,
+        {
+          position: "top-center",
+          duration: 5000,
+        }
+      );
+      navigate("/login");
     }
   };
 
@@ -73,7 +90,7 @@ const Login = () => {
     <>
       <img src={Logo} alt="Taskflow" className="mx-auto mt-8 w-32 md:w-48" />
       <form className="border-2 border-dashed border-accent-light p-4 mx-4 md:mx-auto w-full md:w-[24rem] rounded-md mt-8">
-        <h1 className="text-center font-bold text-2xl mb-4 ">Login</h1>
+        <h1 className="text-center font-bold text-2xl mb-4 ">Signup</h1>
         <section>
           <label htmlFor="email" className="block mb-2">
             Email
@@ -85,7 +102,11 @@ const Login = () => {
             maxLength={256}
             value={formData.email}
             onChange={(e) => {
-              setFormError({ EmailError: null, PasswordError: null });
+              setFormError({
+                EmailError: null,
+                PasswordError: null,
+                ConfirmPasswordError: null,
+              });
               setFormData((prevData: FormData) => {
                 return { ...prevData, email: e.target.value };
               });
@@ -107,9 +128,40 @@ const Login = () => {
             maxLength={256}
             value={formData.password}
             onChange={(e) => {
-              setFormError({ EmailError: null, PasswordError: null });
+              setFormError({
+                EmailError: null,
+                PasswordError: null,
+                ConfirmPasswordError: null,
+              });
               setFormData((prevData: FormData) => {
                 return { ...prevData, password: e.target.value };
+              });
+            }}
+            className="w-full bg-primary-light p-2 rounded-md outline-accent-light"
+          />
+
+          {formError.PasswordError && (
+            <p className="text-accent-red text-sm">{formError.PasswordError}</p>
+          )}
+        </section>
+        <section>
+          <label htmlFor="password" className="block my-2">
+            Confirm Password
+          </label>
+          <input
+            type={showPassword ? "text" : "password"}
+            name="confirmPassword"
+            id="confirmPassword"
+            maxLength={256}
+            value={formData.confirmPassword}
+            onChange={(e) => {
+              setFormError({
+                EmailError: null,
+                PasswordError: null,
+                ConfirmPasswordError: null,
+              });
+              setFormData((prevData: FormData) => {
+                return { ...prevData, confirmPassword: e.target.value };
               });
             }}
             className="w-full bg-primary-light p-2 rounded-md outline-accent-light"
@@ -121,20 +173,22 @@ const Login = () => {
           >
             {showPassword ? "hide" : "show"} password
           </button>
-          {formError.PasswordError && (
-            <p className="text-accent-red text-sm">{formError.PasswordError}</p>
+          {formError.ConfirmPasswordError && (
+            <p className="text-accent-red text-sm">
+              {formError.ConfirmPasswordError}
+            </p>
           )}
         </section>
         <button
           onClick={handleSubmit}
           className="bg-primary-text w-full text-primary-dark font-bold rounded-md my-4 py-2"
         >
-          Login
+          Signup
         </button>
         <p className="text-center">
-          Don&apos;t have an account?{" "}
-          <a href="/signup" className="underline">
-            Signup
+          Already have an account?{" "}
+          <a href="/login" className="underline">
+            Login
           </a>
         </p>
       </form>
@@ -142,4 +196,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
