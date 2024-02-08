@@ -27,7 +27,7 @@ export const SignIn = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = await GetUserByEmail(email);
   if (user.length === 0) {
-    res.status(404).send({ message: "no user with was found" });
+    res.status(404).send({ message: "no user with this email was found" });
     return;
   }
   const validPassword = await bcrypt.compare(password, user[0].password);
@@ -42,5 +42,5 @@ export const SignIn = async (req: Request, res: Response) => {
     process.env.AUTH_SECRET
   );
 
-  res.status(200).send({ message: "logged in successfully", data: token });
+  res.status(200).send({ message: "logged in successfully", token });
 };
