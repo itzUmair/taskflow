@@ -24,6 +24,8 @@ const Login = () => {
     PasswordError: null,
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -99,7 +101,7 @@ const Login = () => {
             Password
           </label>
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             id="password"
             maxLength={256}
@@ -112,6 +114,13 @@ const Login = () => {
             }}
             className="w-full bg-primary-light p-2 rounded-md outline-accent-light"
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prevState) => !prevState)}
+            className="text-primary-text italic text-sm underline"
+          >
+            {showPassword ? "hide" : "show"} password
+          </button>
           {formError.PasswordError && (
             <p className="text-accent-red text-sm">{formError.PasswordError}</p>
           )}
