@@ -14,21 +14,17 @@ export const tasks = mysqlTable("tasks", {
   name: varchar("name", { length: 100 }).notNull(),
   description: varchar("description", { length: 500 }),
   deadline: timestamp("deadline").notNull(),
-  priority: text("priority", { enum: ["low", "medium", "high"] }),
-  status: text("status", { enum: ["todo", "doing", "done"] }),
+  priority: text("priority", { enum: ["low", "medium", "high"] }).notNull(),
+  status: text("status", { enum: ["todo", "doing", "done"] }).notNull(),
   created_by: int("created_by")
     .references(() => users.id)
     .notNull(),
   created_on: timestamp("date_created").default(sql`CURRENT_TIMESTAMP`),
-  marked_working_by: int("marked_working_by")
-    .references(() => users.id)
-    .notNull(),
+  marked_working_by: int("marked_working_by").references(() => users.id),
   marked_working_on: timestamp("marked_working_on").default(
     sql`CURRENT_TIMESTAMP`
   ),
-  marked_complete_by: int("marked_complete_by")
-    .references(() => users.id)
-    .notNull(),
+  marked_complete_by: int("marked_complete_by").references(() => users.id),
   marked_complete_on: timestamp("marked_complete_on").default(
     sql`CURRENT_TIMESTAMP`
   ),
