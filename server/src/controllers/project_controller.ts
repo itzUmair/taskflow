@@ -7,21 +7,24 @@ import {
   UserCreatedProjects,
 } from "../data-access/projects";
 
-export const UserProjects = async (req: Request, res: Response) => {
-  let projects: any = [];
-  const { token, currentproject } = req.params;
-  const userid = parseInt(jwt.decode(token) as string);
-  if (currentproject !== "notset") {
-    const projectdetail = ProjectDetails(parseInt(currentproject));
-    const projecttasks = ProjectTasks(parseInt(currentproject));
+type UserToken = {
+  userid: number;
+  iat: number;
+};
 
-    Promise.all([projectdetail, projecttasks]).then((values) =>
-      projects.push({ ...values[0], ...values[1] })
-    );
-    res.status(200).send({ message: "fetched successfully", data: projects });
-  }
-  const userprojects = await UserCreatedProjects(userid);
-  for (let i = 0; i < userprojects.length; i++) {
-    const projecttasks = await ProjectTasks(userprojects[i].id);
-  }
+export const UserProjects = async (req: Request, res: Response) => {
+  const { token } = req.params;
+  const { userid } = jwt.decode(token) as UserToken;
+
+  const projects = await UserCreatedProjects(userid);
+
+  res.status(200).send({ message: "fetched successfully", data: projects });
+};
+
+export const CurrentProjectTasks = async (req: Request, res: Response) => {
+  const { projectid } = req.params;
+
+  const tasks = await ProjectTasks(parseInt(projectid));
+
+  res.status(200).send({ message: "fetched successfully", data: tasks });
 };

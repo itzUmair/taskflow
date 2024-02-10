@@ -13,7 +13,7 @@ export const ProjectDetails = async (projectid: number): Promise<Project> => {
     .from(projects)
     .where(eq(projects.id, projectid));
 
-  connection.end();
+  await connection.end();
   return projectdetails[0];
 };
 
@@ -27,7 +27,7 @@ export const UserCreatedProjects = async (
     .from(projects)
     .where(eq(projects.created_by, userid));
 
-  connection.end();
+  await connection.end();
   return userprojects;
 };
 
@@ -39,6 +39,19 @@ export const ProjectTasks = async (projectid: number): Promise<Task[]> => {
     .from(tasks)
     .where(eq(tasks.project_id, projectid));
 
-  connection.end();
+  await connection.end();
   return projecttasks;
+};
+
+export const UserInProjects = async (userid: number): Promise<Project[]> => {
+  const { db, connection } = await ConnectDB();
+
+  const projectlist = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.created_by, userid));
+
+  await connection.end();
+
+  return projectlist;
 };
