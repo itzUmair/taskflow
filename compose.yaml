@@ -1,0 +1,23 @@
+services:
+  web:
+    build:
+      context: .
+    image: taskflow
+    container_name: taskflow
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
+      - /app/node_modules
+  database:
+    image: mysql:8.0
+    container_name: taskflow_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - 3307:3306
+    volumes:
+      - taskflow_data:/var/lib/mysql
+
+volumes:
+  taskflow_data:
