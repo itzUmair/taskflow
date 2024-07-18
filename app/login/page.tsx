@@ -10,7 +10,7 @@ function page() {
       <h3 className="text-center">Login to continue tracking your work!</h3>
       <LoginForm />
       <p className="text-center mt-2">
-        Already have an account?&nbsp;
+        Don&apos;t have an account?&nbsp;
         <Link href="/register" className="underline text-bold">
           Signup
         </Link>
